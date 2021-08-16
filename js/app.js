@@ -1,108 +1,145 @@
 'use strict';
 let attemptEl = document.getElementById('attempts');
-let container = document.getElementById('imageGroupContainer');
+let container = document.getElementById('image-container');
 
-let leftImage = document.getElementById('leftImage');
-let middleImage = document.getElementById('middleImage');
-let rightImage = document.getElementById('rightImage');
+let leftImg = document.getElementById('leftImg');
+let centerImg = document.getElementById('centerImg');
+let rightImg = document.getElementById('rightImg');
 
-let viewResults = document.getElementById('viewResults');
 let result = document.getElementById('results');
+let viewResults = document.getElementById('viewResults');
 
+let images=['bag.jpg', 'banana.jpg', 'bathroom.jpg', 'boots.jpg', 'breakfast.jpg', 'bubblegum.jpg', 'chair.jpg', 'cthulhu.jpg', 'dog-duck.jpg', 'dragon.jpg', 'pen.jpg', 'pet-sweep.jpg', 'scissors.jpg', 'shark.jpg', 'sweep.png', 'tauntaun.jpg', 'unicorn.jpg', 'water-can.jpg', 'wine-glass.jpg'];
 let maxAttempts = 25;
+
 let attempt = 1;
+let products = [];
+let gNames = [];
+let votes = [];
+let views = [];
 
-let productsUrl=['bag.jpg', 'banana.jpg', 'bathroom.jpg', 'boots.jpg', 'breakfast.jpg', 'bubblegum.jpg', 'chair.jpg', 'cthulhu.jpg', 'dog-duck.jpg', 'dragon.jpg', 'pen.jpg', 'pet-sweep.jpg', 'scissors.jpg', 'shark.jpg', 'sweep.png', 'tauntaun.jpg', 'unicorn.jpg', 'water-can.jpg', 'wine-glass.jpg'];
-
-
-// our image constructor
-let image = [];
-function itemsImg(itemsName) {
-  this.imgName = itemsName.split('.')[0];
-  this.img = `images/${itemsName}`;
-  this.votes = 0;
-  this.views = 0;
-  image.push(this);
+function itemsImg(itemName) {
+    this.gName = itemName.split('.')[0];
+    this.itemsImg = `image/${itemName}`;
+    this.votes = 0;
+    this.views = 0;
+    products.push(this);
+    gNames.push(this.gName);
 }
 
-// for loop to add images from the array
-for (let i = 0; i < productsUrl.length; i++) {
-  new itemsImg(productsUrl[i]);
+
+
+for (let i = 0; i < images.length; i++) {
+    new itemsImg(images[i]);
 }
 
-// function to create a random image
+console.log(products);
 function randomImage() {
-  return Math.floor(Math.random() * image.length);
+    return Math.floor(Math.random() * products.length);
+
 }
+let leftIndex;
+let centerIndex;
+let rightIndex;
 
-let firstImage;
-let secondImage;
-let thirdImage;
-
-
-// creating a function that renders our info
-function renderImage() {
-  firstImage = randomImage();
-  secondImage = randomImage();
-  thirdImage = randomImage();
-
-  while (firstImage === secondImage || firstImage === thirdImage || secondImage === thirdImage) {
-    leftImage = randomImage();
-    secondImage = randomImage();
-  }
-
-  leftImage.setAttribute('src', image[firstImage].img);
-  middleImage.setAttribute('src', image[secondImage].img);
-  rightImage.setAttribute('src', image[thirdImage].img);
-
-  image[firstImage].views++;
-  image[secondImage].views++;
-  image[thirdImage].views++;
-}
-renderImage();
-
-// here we have to create a method that does the clicking
-leftImage.addEventListener('click', clicking);
-middleImage.addEventListener('click', clicking);
-rightImage.addEventListener('click', clicking);
-
-// clicking function
-function clicking(event) {
-  if (attempt < maxAttempts) {
-    let clickedImage = event.target.id;
-
-    if (clickedImage === 'leftImage') {
-      image[firstImage].votes++;
-
-    } else if (clickedImage === 'middleImage') {
-      image[secondImage].votes++
-
-    } else if (clickedImage === 'rightImage') {
-      image[thirdImage].votes++
+function renderImg() {
+    leftIndex = randomImage();
+    centerIndex = randomImage();
+    rightIndex = randomImage();
+    while (leftIndex === rightIndex || leftIndex === centerIndex || centerIndex === rightIndex) {
+        leftIndex = randomImage();
+        centerIndex = randomImage();
     }
-
-    renderImage();
-    attempt++;
-    attemptEl.textContent = `attempts: ${attempt}`;
-  } else {
-    leftImage.removeEventListener('click', clicking);
-    middleImage.removeEventListener('click', clicking);
-    rightImage.removeEventListener('click', clicking);
-  }
+    
+    leftImg.setAttribute('src', products[leftIndex].itemsImg);
+    centerImg.setAttribute('src', products[centerIndex].itemsImg);
+    rightImg.setAttribute('src', products[rightIndex].itemsImg);
+    products[leftIndex].views++;
+    products[centerIndex].views++;
+    products[rightIndex].views++;
 }
+renderImg();
 
-// results button 
+leftImg.addEventListener('click', clickHandler);
+centerImg.addEventListener('click', clickHandler);
+rightImg.addEventListener('click', clickHandler);
+
+function clickHandler(event) {
+    if (attempt <= maxAttempts) {
+        let clickedImage = event.target.id;
+        if (clickedImage === 'leftImg') {
+            products[leftIndex].votes++;
+        }
+        else if (clickedImage === 'centerImg') {
+            products[centerIndex].votes++
+        } 
+        else if (clickedImage === 'rightImg') {
+            products[rightIndex].votes++
+        }
+        renderImg();
+        console.log(products);
+        attempt++;
+    } else {
+        // result
+        for (let i = 0; i < products.length; i++) {
+            let liEl = document.createElement('li');
+            result.appendChild(liEl);
+            liEl.textContent = `${products[i].gName} has ${products[i].votes} votes and  ${products[i].views} views.`;
+            votes.push(products[i].votes);
+            views.push(products[i].views);
+        }
+        leftImg.removeEventListener('click', clickHandler);
+        centerImg.removeEventListener('click', clickHandler);
+        rightImg.removeEventListener('click', clickHandler);
+    }
+}
 viewResults.addEventListener('click', resultsButton);
 function resultsButton() {
 
-  for (let i = 0; i < image.length; i++) {
+  for (let i = 0; i < products.length; i++) {
 
     let liEl = document.createElement('li');
     result.appendChild(liEl);
-    liEl.textContent = `${image[i].imgName} has ${image[i].votes} votes and  ${image[i].views} views.`;
+    liEl.textContent = `${products[i].gName} has ${products[i].votes} votes and  ${products[i].views} views.`;
   }
-
   let liEl1 = document.createElement('li');
   result.appendChild(liEl1);
-  liEl1.textContent = `//////////////////////////////////////////////////////////`;
+  liEl1.textContent = `..............................................................`;
 }
+// function chartRender() {
+//     let ctx = document.getElementById('myChart').getContext('2d');
+//     let myChart = new Chart(ctx, {
+//         type: 'bar',
+//         data: {
+//             labels: gNames,
+//             datasets: [{
+//                 label: '# of Votes',
+//                 data: votes,
+//                 backgroundColor: [
+//                     'rgba(255, 99, 132, 0.2)'
+//                 ],
+//                 borderColor: [
+//                     'rgba(255, 99, 132, 1)'
+//                 ],
+//                 borderWidth: 1
+//             }, {
+//                 label: '# of views',
+//                 data: views,
+//                 backgroundColor: [
+//                     'rgba(54, 162, 235, 0.2)'
+//                 ],
+//                 borderColor: [
+//                     'rgba(54, 162, 235, 1)'
+//                 ],
+//                 borderWidth: 1
+//             }]
+//         },
+//         options: {
+//             scales: {
+//                 y: {
+//                     beginAtZero: true
+//                 }
+//             }
+//         }
+//     });
+// }
