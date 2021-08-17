@@ -22,6 +22,21 @@ let imageName = [];
 let votes = [];
 let views = [];
 
+// local storege functions
+function saveToLocalStorage() {
+    let data = JSON.stringify(products);
+    localStorage.setItem('products', data);
+}
+function readFromLocalStorage() {
+    let stringObj = localStorage.getItem('products');
+    let normalObj = JSON.parse(stringObj);
+
+    products = normalObj;
+    renderImg();
+}
+
+
+////////////////////////////////////////
 function itemsImg(itemName) {
     this.gName = itemName.split('.')[0];
     this.itemsImg = `image/${itemName}`;
@@ -97,7 +112,10 @@ function clickHandler(event) {
         centerImg.removeEventListener('click', clickHandler);
         rightImg.removeEventListener('click', clickHandler);
         chartRender();
+        saveToLocalStorage();
+        readFromLocalStorage();
     }
+    //results button
 }
 viewResults.addEventListener('click', resultsButton);
 function resultsButton() {
@@ -113,6 +131,7 @@ function resultsButton() {
   liEl1.textContent = `..............................................................`;
 
 }
+
 
 function chartRender(){
   let ctx = document.getElementById('myChart').getContext('2d');
