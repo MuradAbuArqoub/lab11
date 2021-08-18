@@ -30,9 +30,11 @@ function saveToLocalStorage() {
 function readFromLocalStorage() {
     let stringObj = localStorage.getItem('products');
     let normalObj = JSON.parse(stringObj);
+    if(normalObj){
+        products = normalObj;
+    }
+    
 
-    products = normalObj;
-    renderImg();
 }
 
 
@@ -53,6 +55,7 @@ for (let i = 0; i < images.length; i++) {
     new itemsImg(images[i]);
 }
 
+
 console.log(products);
 function randomImage() {
     return Math.floor(Math.random() * products.length);
@@ -61,7 +64,7 @@ function randomImage() {
 let leftIndex;
 let centerIndex;
 let rightIndex;
-
+readFromLocalStorage();
 function renderImg() {
     leftIndex = randomImage();
     centerIndex = randomImage();
@@ -97,23 +100,24 @@ function clickHandler(event) {
             products[rightIndex].votes++
         }
         renderImg();
+        saveToLocalStorage();
         console.log(products);
         attempt++;
     } else {
         // result
-        for (let i = 0; i < products.length; i++) {
-            let liEl = document.createElement('li');
-            result.appendChild(liEl);
-            liEl.textContent = `${products[i].gName} has ${products[i].votes} votes and  ${products[i].views} views.`;
-            votes1.push(products[i].votes);
-            views1.push(products[i].views);
-        }
+        // for (let i = 0; i < products.length; i++) {
+        //     let liEl = document.createElement('li');
+        //     result.appendChild(liEl);
+        //     liEl.textContent = `${products[i].gName} has ${products[i].votes} votes and  ${products[i].views} views.`;
+        //     votes1.push(products[i].votes);
+        //     views1.push(products[i].views);
+        // }
         leftImg.removeEventListener('click', clickHandler);
         centerImg.removeEventListener('click', clickHandler);
         rightImg.removeEventListener('click', clickHandler);
         chartRender();
-        saveToLocalStorage();
-        readFromLocalStorage();
+        
+        
     }
     //results button
 }
